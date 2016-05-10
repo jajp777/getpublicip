@@ -8,20 +8,27 @@ function Get-PublicIPAddress {
         
         [Parameter(Mandatory=$false)]
         [Int]
-        $Delay = 5
+        $Delay = 5,
+        
+        [Parameter(Mandatory=$false)]
+        [String]
+        $OutFile
     )
     process {       
         # Define URL to get public IP address:
         $url = "https://api.ipify.org/?format=json"
         
-        # Define return psobject and get public IP address:
         $counter = 0
         do {
             $counter++
-            $returnobject = New-Object -TypeName PSObject
-            $returnobject | Add-Member -MemberType NoteProperty -Name Datetime -Value (Get-Date)
-            $returnobject | Add-Member -MemberType NoteProperty -Name IP -Value (Invoke-RestMethod -Uri $url).ip -PassThru
-            if ($Iterate -gt 1) { Start-Sleep -Seconds $Delay }
+            
+            $out = New-Object -TypeName PSObject
+            $out | Add-Member -MemberType NoteProperty -Name Datetime -Value (Get-Date)
+            $out | Add-Member -MemberType NoteProperty -Name IP -Value (Invoke-RestMethod -Uri $url).ip 
+            if ($OutFile) { $out | Out-File -Append -FilePath $OutFile }
+            else { $out }
+            
+            if ($Iterate -gt 1 -and $counter -lt $Iterate) { Start-Sleep -Seconds $Delay }
         } while ($counter -lt $Iterate)
     }
 }
