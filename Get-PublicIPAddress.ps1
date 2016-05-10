@@ -4,7 +4,11 @@ function Get-PublicIPAddress {
     param(
         [Parameter(Mandatory=$false)]
         [Int]
-        $Iterate = 1
+        $Iterate = 1,
+        
+        [Parameter(Mandatory=$false)]
+        [Int]
+        $Delay = 5
     )
     process {       
         # Define URL to get public IP address:
@@ -17,7 +21,7 @@ function Get-PublicIPAddress {
             $returnobject = New-Object -TypeName PSObject
             $returnobject | Add-Member -MemberType NoteProperty -Name Datetime -Value (Get-Date)
             $returnobject | Add-Member -MemberType NoteProperty -Name IP -Value (Invoke-RestMethod -Uri $url).ip -PassThru
-            if ($Iterate -gt 1) { Start-Sleep -Seconds 2 }
+            if ($Iterate -gt 1) { Start-Sleep -Seconds $Delay }
         } while ($counter -lt $Iterate)
     }
 }
